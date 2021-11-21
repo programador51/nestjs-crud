@@ -75,7 +75,7 @@ export class DatabaseService {
         return new Promise((resolve, reject) => {
             this.connection.query(query, inputs, (error, result, fields) => {
 
-                this.connection.end();
+                // this.connection.end();
 
                 if (error) {
                     console.log({
