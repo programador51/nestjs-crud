@@ -11,18 +11,20 @@ export class DatabaseService {
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME
+            database: process.env.DB_NAME,
+
         });
 
         this.connection.connect(e => {
             if (e) {
-                console.log('Error to connect DB:', e);
+                console.log('Error to connect DB, retrying on 5 secs', e);
                 this.reconnectDb(1);
             }
         });
 
-        this.connection.on('error', (error) => {
-            if (error = 'PROTOCOL_CONNECTION_LOST') {
+        this.connection.on('error', (e) => {
+            if (e = 'PROTOCOL_CONNECTION_LOST') {
+                console.log('Error to connect DB, retrying on 5 secs', e);
                 this.reconnectDb(1);
             }
         })
@@ -40,6 +42,9 @@ export class DatabaseService {
     }
  */
     reconnectDb(counterTry = 1) {
+
+        console.log('Reonnect try', counterTry);
+
         this.connection = createConnection({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
@@ -49,18 +54,19 @@ export class DatabaseService {
 
         this.connection.connect(e => {
             if (e && counterTry < 5) {
-                console.log('Error to connect DB:', e);
+                console.log('Error to connect DB, retrying on 5 secs', e);
                 setTimeout(() => {
                     this.reconnectDb(counterTry += 1);
-                }, 30000)
+                }, 5000)
             }
         });
 
-        this.connection.on('error', (error) => {
-            if (error = 'PROTOCOL_CONNECTION_LOST') {
+        this.connection.on('error', (e) => {
+            if (e = 'PROTOCOL_CONNECTION_LOST') {
                 setTimeout(() => {
+                    console.log('Error to connect DB, retrying on 5 secs', e);
                     this.reconnectDb(counterTry += 1);
-                }, 30000)
+                }, 5000)
             }
         })
     }
@@ -68,6 +74,9 @@ export class DatabaseService {
     query(query: string, inputs = []): Promise<IQuery> {
         return new Promise((resolve, reject) => {
             this.connection.query(query, inputs, (error, result, fields) => {
+
+                this.connection.end();
+
                 if (error) {
                     console.log({
                         status: 500,
