@@ -31,7 +31,7 @@ let TaskService = class TaskService {
         return dtoTasks;
     }
     async postTask(task, idUser) {
-        this.sql.query(`INSERT INTO tasks
+        return this.sql.query(`INSERT INTO tasks
         (description,userId) VALUES (?,?)`, [task, idUser]);
     }
     async updateStatus(task, status) {

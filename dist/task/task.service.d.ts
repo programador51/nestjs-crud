@@ -5,7 +5,7 @@ export declare class TaskService {
     private sql;
     constructor(sql: DatabaseService);
     getTasks(page: number | string): Promise<ResTaskDTO>;
-    postTask(task: string, idUser: number): Promise<void>;
+    postTask(task: string, idUser: number): Promise<IQuery>;
     updateStatus(task: (number | string), status: (0 | 1)): Promise<IQuery>;
     updateTask(idTask: number, content: string): Promise<IQuery>;
     deleteTask(idTask: number): Promise<IQuery>;

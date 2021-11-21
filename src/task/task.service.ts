@@ -36,7 +36,7 @@ export class TaskService {
     }
 
     async postTask(task: string, idUser: number) {
-        this.sql.query(`INSERT INTO tasks
+        return this.sql.query(`INSERT INTO tasks
         (description,userId) VALUES (?,?)`, [task, idUser]);
     }
 

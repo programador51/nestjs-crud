@@ -17,6 +17,13 @@ export class DatabaseService {
         this.connection.connect(e => {
             if (e) {
                 console.log('Error to connect DB:', e);
+                this.reconnectDb(1);
+            }
+        });
+
+        this.connection.on('error', (error) => {
+            if (error = 'PROTOCOL_CONNECTION_LOST') {
+                this.reconnectDb(1);
             }
         })
     }
@@ -32,6 +39,32 @@ export class DatabaseService {
         return result;
     }
  */
+    reconnectDb(counterTry = 1) {
+        this.connection = createConnection({
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME
+        });
+
+        this.connection.connect(e => {
+            if (e && counterTry < 5) {
+                console.log('Error to connect DB:', e);
+                setTimeout(() => {
+                    this.reconnectDb(counterTry += 1);
+                }, 30000)
+            }
+        });
+
+        this.connection.on('error', (error) => {
+            if (error = 'PROTOCOL_CONNECTION_LOST') {
+                setTimeout(() => {
+                    this.reconnectDb(counterTry += 1);
+                }, 30000)
+            }
+        })
+    }
+
     query(query: string, inputs = []): Promise<IQuery> {
         return new Promise((resolve, reject) => {
             this.connection.query(query, inputs, (error, result, fields) => {
